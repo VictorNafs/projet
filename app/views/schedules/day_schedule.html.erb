@@ -1,5 +1,12 @@
 <h1>Planning pour le <%= @date.strftime("%d %B %Y") %></h1>
 
+<h2>Produits disponibles :</h2>
+<% @products.each do |product| %>
+  <p>
+    <%= product.name %> <!-- ou n'importe quel autre attribut du produit -->
+  </p>
+<% end %>
+
 <table class="table table-bordered">
   <thead>
     <tr>
