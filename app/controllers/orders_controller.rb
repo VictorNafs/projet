@@ -17,8 +17,8 @@ class OrdersController < StoreController
     quantities = params[:quantities]&.map { |q| Array(q) }&.flatten&.map(&:to_i) || []
     product_id = params[:product_id]
   
-    order = current_order || Spree::Order.new(order_params)
-    order.start! if order.new_record?
+    order = current_order || Spree::Order.create!(order_params)
+
       
     variant_ids.each_with_index do |variant_id, index|
       variant = Spree::Variant.find(variant_id)
