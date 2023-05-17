@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_05_11_174858) do
+ActiveRecord::Schema[7.0].define(version: 2023_05_11_222709) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -84,6 +84,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_11_174858) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.integer "paypal_funding_source"
+  end
+
+  create_table "purchased_products", force: :cascade do |t|
+    t.integer "product_id"
+    t.integer "product_instance_id"
+    t.date "purchase_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "reservations", force: :cascade do |t|
@@ -269,6 +277,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_11_174858) do
     t.decimal "additional_tax_total", precision: 10, scale: 2, default: "0.0"
     t.decimal "promo_total", precision: 10, scale: 2, default: "0.0"
     t.decimal "included_tax_total", precision: 10, scale: 2, default: "0.0", null: false
+    t.integer "product_number"
+    t.datetime "date"
+    t.integer "time_slot"
     t.index ["order_id"], name: "index_spree_line_items_on_order_id"
     t.index ["variant_id"], name: "index_spree_line_items_on_variant_id"
   end
@@ -927,6 +938,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_11_174858) do
     t.datetime "updated_at", null: false
     t.string "originator_type"
     t.integer "originator_id"
+    t.date "date"
+    t.boolean "reserved", default: false
+    t.integer "time_slot"
     t.index ["stock_item_id"], name: "index_spree_stock_movements_on_stock_item_id"
   end
 
@@ -1203,6 +1217,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_11_174858) do
     t.datetime "updated_at"
     t.datetime "created_at"
     t.bigint "shipping_category_id"
+    t.boolean "reserved", default: false
+    t.date "date"
     t.index ["position"], name: "index_spree_variants_on_position"
     t.index ["product_id"], name: "index_spree_variants_on_product_id"
     t.index ["shipping_category_id"], name: "index_spree_variants_on_shipping_category_id"
@@ -1240,6 +1256,17 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_11_174858) do
     t.datetime "updated_at"
   end
 
+  create_table "time_slots", force: :cascade do |t|
+    t.date "date"
+    t.time "start_time"
+    t.time "end_time"
+    t.bigint "product_id"
+    t.boolean "reserved"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_time_slots_on_product_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "spree_promotion_code_batches", "spree_promotions", column: "promotion_id"
@@ -1247,4 +1274,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_11_174858) do
   add_foreign_key "spree_tax_rate_tax_categories", "spree_tax_categories", column: "tax_category_id"
   add_foreign_key "spree_tax_rate_tax_categories", "spree_tax_rates", column: "tax_rate_id"
   add_foreign_key "spree_wallet_payment_sources", "spree_users", column: "user_id"
+  add_foreign_key "time_slots", "spree_products", column: "product_id"
 end
