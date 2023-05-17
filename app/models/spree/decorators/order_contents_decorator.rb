@@ -29,7 +29,7 @@ module Spree
       end
 
       def add_to_line_item(variant, quantity, options = {})
-        line_item = add_to_line_item_without_separation(variant, quantity, options)
+        line_item = add(variant, quantity, options)
         line_item.save!
         line_item
       end
@@ -39,8 +39,6 @@ module Spree
         line_item.variant.product.update(purchase_date: options[:date], purchase_time_slot: options[:time_slot])
       end
     end
-
-    alias_method :add_to_line_item_without_separation, :add_to_line_item
   end
 end
 
