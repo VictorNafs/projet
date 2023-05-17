@@ -1,5 +1,5 @@
 module Spree
-  module OrderContentsDecorator
+  module OrderContentsExtension
     def self.prepended(base)
       base.prepend(InstanceMethods)
     end
@@ -43,5 +43,5 @@ module Spree
 end
 
 Rails.application.config.to_prepare do
-  Spree::OrderContents.prepend Spree::OrderContentsDecorator
+  Spree::OrderContents.prepend Spree::OrderContentsExtension
 end
