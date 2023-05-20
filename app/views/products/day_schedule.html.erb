@@ -1,43 +1,39 @@
-<%= form_with url: orders_populate_path, method: :post, id: "add-selected-products-to-cart-form" do %>
-  <%= hidden_field_tag :product_id, @product.id %>
-  <div class="container">
-    <div class="table-responsive">
-      <table class="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>Heure</th>
-            <th>Produit</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @instances.each_with_index do |stock_item, index| %>
-            <% stock_movement = stock_item.stock_movements.first %>
+<% provide(:title, "Planning") %>
+
+<h1>Planning du jour</h1>
+
+<%= form_with url: orders_populate_path, method: :post, local: true do |f| %>
+  <%= f.hidden_field :selected_date, value: @selected_date %>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Produit</th>
+          <th>Créneau horaire</th>
+          <th>Sélection</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% ["8h / 13h", "13h / 20h"].each do |time_slot| %>
+          <% @instances.take(1).each_with_index do |stock_item, index| %>
             <tr>
-              <% product_number = @stock_movements[stock_item.id]&.find_index(stock_movement) %>
-              <% if product_number.present? %>
-                <td><%= "#{index}:00" %> (Produit <%= product_number + 1 %>)</td>
-              <% else %>
-                <td><%= "#{index}:00" %></td>
-              <% end %>
-              <% if time_slot_reserved?(@selected_date, stock_movement.time_slot) %>
-                <td></td>
-                <td></td>
-              <% else %>
-                <td><%= @product.name %></td>
+              <td><%= stock_item.variant.product.name %></td>
+              <td><%= time_slot %></td>
+              <% if !time_slot_reserved?(@selected_date, time_slot, stock_item) %>
                 <td>
-                  <%= check_box_tag "selected_products[]", stock_item.variant_id, false %>
-                  <%= hidden_field_tag "quantities[]", 1 %>
-                  <%= hidden_field_tag "product_number[]", product_number %>
+                  <%= f.check_box :product_ids, { multiple: true, value: stock_item.variant.product.id }, stock_item.variant.product.id, nil %>
+                  <%= f.hidden_field :time_slot, value: time_slot %>
                 </td>
+              <% else %>
+                <td>Réservé</td>
               <% end %>
             </tr>
           <% end %>
-        </tbody>
-      </table>
-    </div>
-    <div class="form-group">
-      <%= submit_tag "Ajouter les produits sélectionnés au panier", type: "submit", id: "add-selected-products-to-cart", class: "btn btn-primary" %>
-    </div>
+        <% end %>
+      </tbody>
+    </table>
   </div>
+
+  <%= f.submit 'Ajouter au panier' %>
 <% end %>

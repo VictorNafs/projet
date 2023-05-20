@@ -15,9 +15,11 @@
     <div class="cart-item__info">
       <div class="cart-item-description">
         <%= line_item.variant.product.name %>
-        <% if line_item.date.present? && line_item.time_slot.present? %>
-<span class="reservation-date-time" style="display: block;">(<%= line_item.date.strftime('%d/%m/%Y') %> de <%= line_item.time_slot %>:00h à <%= line_item.time_slot + 1 %>:00h)</span>
-        <% end %>
+
+        <!-- Nouveau code pour afficher la date et le créneau horaire -->
+        <br>Date: <%= line_item.date ? line_item.date.strftime('%d/%m/%Y') : "Non renseignée" %>
+<br>Créneau horaire: <%= line_item.time_slot ? "#{line_item.time_slot}h à #{line_item.time_slot.to_i + 5}h" : "Non renseigné" %>
+
         <%= line_item_description_text(line_item.description) %>
       </div>
       <%= render(

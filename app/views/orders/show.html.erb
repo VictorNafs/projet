@@ -23,11 +23,20 @@
           <th><%= t('spree.price') %></th>
           <th><%= t('spree.qty') %></th>
           <th><%= t('spree.total') %></th>
+          <!-- Ajoutez ces deux nouvelles colonnes pour la date et le créneau horaire -->
+          <th><%= t('spree.date') %></th>
+          <th><%= t('spree.time_slot') %></th>
         </tr>
       </thead>
       <tbody>
         <% @order.line_items.each do |line_item| %>
-          <%= render 'line_item', line_item: line_item %>
+          <tr>
+            <!-- Remplacez cette ligne avec les informations de l'article -->
+            <%= render 'line_item', line_item: line_item %>
+            <!-- Nouveau code pour afficher la date et le créneau horaire -->
+            <td><%= line_item.date || 'Non renseignée' %></td>
+            <td><%= line_item.time_slot || 'Non renseigné' %></td>
+          </tr>
         <% end %>
       </tbody>
     </table>

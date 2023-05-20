@@ -13,57 +13,46 @@ class OrdersController < StoreController
   end
 
   def populate
-    variant_ids = params[:selected_products]&.reject(&:blank?)&.map(&:to_i) || []
-    quantities = params[:quantities]&.map { |q| Array(q) }&.flatten&.map(&:to_i) || []
-    product_id = params[:product_id]
+    product_ids = params[:product_ids]
+    success = true
+    last_product = nil
   
-    order = current_order || Spree::Order.create!(order_params)
-
-      
-    variant_ids.each_with_index do |variant_id, index|
-      variant = Spree::Variant.find(variant_id)
-      quantity = quantities[index]
+    product_ids.each do |product_id|
+      product = Spree::Product.find(product_id)
+      last_product = product
+      variant = product.master
+      date = params[:selected_date].to_date
+      time_slot = params[:time_slot]
   
-      # Ajoutez l'index de la ligne du produit comme une option personnalisée
-      options = { product_line_index: index }.merge(params[:options] || {})
+      stock_movement = Spree::StockMovement.where(stock_item_id: variant.stock_items.first.id, date: date).first
   
-      # Ajoutez les informations de réservation (date et créneau horaire) ici
-      date = params[:date] # Remplacez par le paramètre approprié
-      time_slot = params[:time_slot] # Remplacez par le paramètre approprié
-      options[:date] = date
-      options[:time_slot] = time_slot
-  
-      line_item = order.contents.add(variant, quantity, options)
-  
-      # Ajoutez cette ligne après avoir ajouté le produit au panier
-      PurchasedProduct.create(product_id: product_id, product_instance_id: variant_id, purchase_date: Date.current)
+      # Ajouter le produit au panier avec le numéro du produit, la date et le créneau horaire
+      line_item = current_order.contents.add(variant, 1)
+    
+      # Mettre à jour la date et le créneau horaire de l'article de commande (line_item)
+      if line_item.update(date: date, time_slot: time_slot)
+        # Marquer le stock_movement comme réservé
+        # stock_movement.update(reserved: true)
+      else
+        success = false
+      end
     end
   
-    if order.save
-      respond_with(order) do |format|
-        format.html { redirect_to product_path(product_id) }
-        format.js { render :populate }
-      end
+    if success
+      flash[:success] = I18n.t(:successfully_added_to_your_cart)
+      redirect_to main_app.product_path(last_product)
     else
-      flash[:error] = t('spree.unable_to_add_product')
-      respond_with(order) do |format|
-        format.html { redirect_to :back }
-        format.js { render :populate }
-      end
+      flash[:error] = I18n.t(:not_all_items_added_to_cart)
+      redirect_to main_app.product_path(last_product)
     end
   end
-  
-  
-  
-  
-  
+ 
   
   
   
   
 
   
-
   private
 
   def store_guest_token

@@ -30,7 +30,7 @@ class ProductsController < StoreController
   end
 
   def day_schedule
-    @product = Spree::Product.find(params[:product_id])
+    @product = Spree::Product.find_by(slug: params[:id])
     @selected_date = params[:selected_date] || Date.today
     @instances = @product.stock_items.joins(:stock_movements).where('spree_stock_movements.date = ?', @selected_date)
   
@@ -47,19 +47,23 @@ class ProductsController < StoreController
 
   def add_selected_products_to_cart
     selected_products = params[:selected_products].select { |_, v| v.present? }
+    selected_date = Date.parse(params[:selected_date])
+    
     selected_products.each_with_index do |(_, variant_id), index|
-      variant = Spree::Variant.find(variant_id)
-  
-      # Trouver le stock_movement correspondant au variant sélectionné et à la date
-      stock_movement = Spree::StockMovement.find_by(stock_item_id: variant.stock_items.first.id, date: @selected_date)
-  
-      # Ajouter le produit au panier avec le numéro du produit, la date et le créneau horaire
-      current_order.contents.add(variant, 1, product_number: index + 1, date: @selected_date, time_slot: stock_movement.time_slot)
-  
-      # Marquer le stock_movement comme réservé
-      stock_movement.update(reserved: true)
+        variant = Spree::Variant.find(variant_id)
+
+        # Trouver le stock_movement correspondant au variant sélectionné et à la date
+        stock_movement = Spree::StockMovement.find_by(stock_item_id: variant.stock_items.first.id, date: selected_date)
+
+        # Ajouter le produit au panier avec le numéro du produit, la date et le créneau horaire
+        current_order.contents.add(variant, 1, date: selected_date, time_slot: stock_movement.time_slot, product_number: index + 1)
+
+        # Marquer le stock_movement comme réservé
+        stock_movement.update(reserved: true)
     end
-  end
+end
+
+
 
   def accurate_title
     if @product
@@ -90,13 +94,14 @@ class ProductsController < StoreController
     end
   end
 
-  def time_slot_reserved?(date, time_slot)
+  def time_slot_reserved?(date, time_slot, stock_item)
     reserved_line_items = Spree::LineItem.where(date: date, time_slot: time_slot)
-
+  
     reserved_line_items.any? do |line_item|
-      line_item.product_id == @product.id
+      line_item.product_id == stock_item.variant.product.id
     end
   end
+  
   helper_method :time_slot_reserved?
 
   def all_products_sold_out?(date)

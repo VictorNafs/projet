@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_05_11_222709) do
+ActiveRecord::Schema[7.0].define(version: 2023_05_19_220843) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -279,7 +279,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_11_222709) do
     t.decimal "included_tax_total", precision: 10, scale: 2, default: "0.0", null: false
     t.integer "product_number"
     t.datetime "date"
-    t.integer "time_slot"
+    t.string "time_slot"
     t.index ["order_id"], name: "index_spree_line_items_on_order_id"
     t.index ["variant_id"], name: "index_spree_line_items_on_variant_id"
   end

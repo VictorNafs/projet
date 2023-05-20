@@ -16,6 +16,19 @@
     variant: item.variant
   ) %>
 
+  <!-- Nouveau code pour afficher la date et le créneau horaire -->
+  <% if item.date.present? && item.time_slot.present? %>
+    <div class="order-item__date">
+      <strong>Date: <%= item.date %></strong>
+      <strong>Créneau horaire: <%= item.time_slot %></strong>
+    </div>
+  <% else %>
+    <div class="order-item__date">
+      <strong>Date: Non renseignée</strong>
+      <strong>Créneau horaire: Non renseigné</strong>
+    </div>
+  <% end %>
+
   <div class="order-item__price-single">
     <%= item.single_money.to_html %>
   </div>

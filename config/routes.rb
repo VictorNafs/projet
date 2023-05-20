@@ -2,7 +2,6 @@ Rails.application.routes.draw do
   mount SolidusPaypalCommercePlatform::Engine, at: '/solidus_paypal_commerce_platform'
   root to: 'home#index'
 
-  get 'day_schedule/:date', to: 'schedules#day_schedule', as: 'day_schedule'
   get 'calendar/prev_month', to: 'calendar#prev_month', as: 'prev_month'
   get 'calendar/next_month', to: 'calendar#next_month', as: 'next_month'
 
@@ -38,11 +37,9 @@ Rails.application.routes.draw do
 
   resources :products, only: [:index, :show] do
     member do
-      get 'day_schedule', to: 'products#day_schedule', as: 'day_schedule_product' # Retirez :product_id
+      get 'day_schedule'
     end
   end
-  
-  
 
   resources :cart_line_items, only: :create
 
@@ -69,21 +66,19 @@ Rails.application.routes.draw do
 
   post '/orders/populate', to: 'orders#populate', as: :orders_populate
 
-    # route globbing for pretty nested taxon and product paths
-    get '/t/*id', to: 'taxons#show', as: :nested_taxons
+  # route globbing for pretty nested taxon and product paths
+  get '/t/*id', to: 'taxons#show', as: :nested_taxons
 
-    get '/unauthorized', to: 'home#unauthorized', as: :unauthorized
-    get '/cart_link', to: 'store#cart_link', as: :cart_link
-  
-    # This line mounts Solidus's routes at the root of your application.
-    # This means, any requests to URLs such as /products, will go to Spree::ProductsController.
-    # If you would like to change where this engine is mounted, simply change the :at option to something different.
-    #
-    # We ask that you don't use the :as option here, as Solidus relies on it being the default of "spree"
-    mount Spree::Core::Engine, at: '/'
-    # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-  
-    # Defines the root path route ("/")
-    # root "articles#index"
-  end
-  
+  get '/unauthorized', to: 'home#unauthorized', as: :unauthorized
+  get '/cart_link', to: 'store#cart_link', as: :cart_link
+
+  # This line mounts Solidus's routes at the root of your application.
+  # This means, any requests to URLs such as /products, will go to Spree::ProductsController.
+  # If you would like to change where this engine is mounted, simply change the :at option to something different.
+  #
+  # We ask that you don't use the :as option here, as Solidus relies on it being the default of "spree"
+  mount Spree::Core::Engine, at: '/'
+
+  # Defines the root path route ("/")
+  # root "articles#index"
+end
