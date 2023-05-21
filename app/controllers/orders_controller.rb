@@ -52,8 +52,7 @@ class OrdersController < StoreController
       # Ajouter l'article à la commande
       if line_item.save
         order.line_items << line_item
-        # Marquer le stock_movement comme réservé
-        # stock_movement.update(reserved: true)
+        order.recalculate
       else
         success = false
       end
@@ -67,6 +66,7 @@ class OrdersController < StoreController
       redirect_to main_app.product_path(last_product)
     end
   end
+  
   
 
   private

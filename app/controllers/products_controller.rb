@@ -98,9 +98,10 @@ end
     reserved_line_items = Spree::LineItem.where(date: date, time_slot: time_slot)
   
     reserved_line_items.any? do |line_item|
-      line_item.product_id == stock_item.variant.product.id
+      line_item.variant.product_id == stock_item.variant.product.id
     end
   end
+  
   
   helper_method :time_slot_reserved?
 
