@@ -12,25 +12,46 @@ class OrdersController < StoreController
     authorize! :show, @order, cookies.signed[:guest_token]
   end
 
+  def current_order(create_order_if_necessary: false)
+    return @current_order if @current_order
+  
+    if cookies.signed[:order_id]
+      @current_order = Spree::Order.find_by(id: cookies.signed[:order_id])
+    elsif create_order_if_necessary
+      @current_order = Spree::Order.create!(order_params)
+      cookies.permanent.signed[:order_id] = @current_order.id
+    end
+  
+    @current_order
+  end
+
   def populate
-    product_ids = params[:product_ids]
+    order = current_order(create_order_if_necessary: true)
+    product_timeslots = params[:product_timeslots]
     success = true
     last_product = nil
   
-    product_ids.each do |product_id|
+    product_timeslots.each do |product_timeslot|
+      product_id, time_slot = product_timeslot.split(',')
       product = Spree::Product.find(product_id)
       last_product = product
       variant = product.master
       date = params[:selected_date].to_date
-      time_slot = params[:time_slot]
   
       stock_movement = Spree::StockMovement.where(stock_item_id: variant.stock_items.first.id, date: date).first
   
-      # Ajouter le produit au panier avec le numéro du produit, la date et le créneau horaire
-      line_item = current_order.contents.add(variant, 1)
-    
-      # Mettre à jour la date et le créneau horaire de l'article de commande (line_item)
-      if line_item.update(date: date, time_slot: time_slot)
+      # Créer un nouvel article avec la date et le créneau horaire
+      line_item = Spree::LineItem.new(
+        order: order,
+        variant: variant,
+        quantity: 1,
+        date: date,
+        time_slot: time_slot
+      )
+  
+      # Ajouter l'article à la commande
+      if line_item.save
+        order.line_items << line_item
         # Marquer le stock_movement comme réservé
         # stock_movement.update(reserved: true)
       else
@@ -46,13 +67,8 @@ class OrdersController < StoreController
       redirect_to main_app.product_path(last_product)
     end
   end
- 
-  
-  
-  
   
 
-  
   private
 
   def store_guest_token

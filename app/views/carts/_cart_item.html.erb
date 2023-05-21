@@ -16,9 +16,9 @@
       <div class="cart-item-description">
         <%= line_item.variant.product.name %>
 
-        <!-- Nouveau code pour afficher la date et le créneau horaire -->
+        <!-- Code corrigé pour afficher la date et le créneau horaire -->
         <br>Date: <%= line_item.date ? line_item.date.strftime('%d/%m/%Y') : "Non renseignée" %>
-<br>Créneau horaire: <%= line_item.time_slot ? "#{line_item.time_slot}h à #{line_item.time_slot.to_i + 5}h" : "Non renseigné" %>
+        <br>Créneau horaire: <%= line_item.time_slot ? line_item.time_slot : "Non renseigné" %>
 
         <%= line_item_description_text(line_item.description) %>
       </div>
