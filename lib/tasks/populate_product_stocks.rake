@@ -11,20 +11,22 @@ namespace :product_stocks do
         date = Date.today + day_offset
         stock_location = Spree::StockLocation.first
 
-        # Check if there is already a stock item for this date
-        existing_stock_items = variant.stock_items.joins(:stock_movements)
-                                                  .where('spree_stock_movements.date = ?', date)
+        ["8h - 13h", "14h - 20h"].each do |time_slot|
+          # Check if there is already a stock item for this date and time slot
+          existing_stock_item = variant.stock_items.joins(:stock_movements)
+                                                   .where('spree_stock_movements.date = ? AND spree_stock_movements.time_slot = ?', date, time_slot)
+                                                   .first
 
-        next if existing_stock_items.count >= 2
-
-        # Create stock items for this date if they do not exist yet
-        (2 - existing_stock_items.count).times do
-          stock_item = stock_location.stock_items.find_or_create_by(variant: variant)
-          stock_movement = stock_item.stock_movements.create!(
-            quantity: 2,
-            date: date,
-            action: 'restock'
-          )
+          # Create stock item for this date and time slot if it does not exist yet
+          if existing_stock_item.nil?
+            stock_item = stock_location.stock_items.find_or_create_by(variant: variant)
+            stock_movement = stock_item.stock_movements.create!(
+              quantity: 2,
+              date: date,
+              time_slot: time_slot,
+              action: 'restock'
+            )
+          end
         end
       end
     end
