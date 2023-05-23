@@ -79,12 +79,13 @@ class ProductsController < StoreController
   end
 
   def time_slot_reserved?(date, time_slot, stock_item)
-    reserved_line_items = Spree::LineItem.where(date: date, time_slot: time_slot)
+    reserved_line_items = Spree::LineItem.joins(:order).where(date: date, time_slot: time_slot, spree_orders: { state: 'complete' })
   
     reserved_line_items.any? do |line_item|
       line_item.variant.product_id == stock_item.variant.product.id
     end
   end
+  
   
   
   helper_method :time_slot_reserved?

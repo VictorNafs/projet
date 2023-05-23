@@ -57,20 +57,25 @@ class CheckoutsController < CheckoutBaseController
   def finalize_order
     @current_order = nil
     set_successful_flash_notice
-    reserve_products # Ajoutez cette ligne
+    reserve_products # Cette méthode réservera les produits
     redirect_to completion_route
   end
   
-
+  private
+  
   def reserve_products
     @order.line_items.each do |line_item|
-      stock_movement = Spree::StockMovement.find_by(stock_item_id: line_item.variant.stock_items.first.id, date: line_item.date)
-  
+      variant = line_item.variant
+      date = line_item.date
+      stock_movement = Spree::StockMovement.find_by(stock_item_id: variant.stock_items.first.id, date: date)
+      
+      # Mettre à jour le stock_movement pour marquer la réservation du produit
       if stock_movement
         stock_movement.update(reserved: true)
       end
     end
   end
+  
   
   
 
