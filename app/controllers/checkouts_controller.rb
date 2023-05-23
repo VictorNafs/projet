@@ -58,8 +58,11 @@ class CheckoutsController < CheckoutBaseController
     @current_order = nil
     set_successful_flash_notice
     reserve_products # Cette méthode réservera les produits
+    # Réinitialiser l'ID de la commande dans les cookies
+    cookies.delete(:order_id)
     redirect_to completion_route
-  end
+end
+
   
   private
   
