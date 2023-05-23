@@ -45,23 +45,7 @@ class ProductsController < StoreController
   
   private
 
-  def add_selected_products_to_cart
-    selected_products = params[:selected_products].select { |_, v| v.present? }
-    selected_date = Date.parse(params[:selected_date])
-    
-    selected_products.each_with_index do |(_, variant_id), index|
-        variant = Spree::Variant.find(variant_id)
-
-        # Trouver le stock_movement correspondant au variant sélectionné et à la date
-        stock_movement = Spree::StockMovement.find_by(stock_item_id: variant.stock_items.first.id, date: selected_date)
-
-        # Ajouter le produit au panier avec le numéro du produit, la date et le créneau horaire
-        current_order.contents.add(variant, 1, date: selected_date, time_slot: stock_movement.time_slot, product_number: index + 1)
-
-        # Marquer le stock_movement comme réservé
-        stock_movement.update(reserved: true)
-    end
-end
+  
 
 
 

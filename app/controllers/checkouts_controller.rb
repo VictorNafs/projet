@@ -55,11 +55,12 @@ class CheckoutsController < CheckoutBaseController
   end
 
   def finalize_order
-    reserve_products
     @current_order = nil
     set_successful_flash_notice
+    reserve_products # Ajoutez cette ligne
     redirect_to completion_route
   end
+  
 
   def reserve_products
     @order.line_items.each do |line_item|
@@ -70,6 +71,7 @@ class CheckoutsController < CheckoutBaseController
       end
     end
   end
+  
   
 
   def set_successful_flash_notice
