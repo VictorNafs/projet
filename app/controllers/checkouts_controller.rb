@@ -55,10 +55,22 @@ class CheckoutsController < CheckoutBaseController
   end
 
   def finalize_order
+    reserve_products
     @current_order = nil
     set_successful_flash_notice
     redirect_to completion_route
   end
+
+  def reserve_products
+    @order.line_items.each do |line_item|
+      stock_movement = Spree::StockMovement.find_by(stock_item_id: line_item.variant.stock_items.first.id, date: line_item.date)
+  
+      if stock_movement
+        stock_movement.update(reserved: true)
+      end
+    end
+  end
+  
 
   def set_successful_flash_notice
     flash.notice = t('spree.order_processed_successfully')

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_05_19_220843) do
+ActiveRecord::Schema[7.0].define(version: 2023_05_21_160135) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -370,6 +370,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_19_220843) do
     t.integer "store_id"
     t.string "approver_name"
     t.boolean "frontend_viewable", default: true, null: false
+    t.boolean "finalized", default: false
     t.index ["approver_id"], name: "index_spree_orders_on_approver_id"
     t.index ["bill_address_id"], name: "index_spree_orders_on_bill_address_id"
     t.index ["completed_at"], name: "index_spree_orders_on_completed_at"
@@ -940,7 +941,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_19_220843) do
     t.integer "originator_id"
     t.date "date"
     t.boolean "reserved", default: false
-    t.integer "time_slot"
+    t.string "time_slot"
     t.index ["stock_item_id"], name: "index_spree_stock_movements_on_stock_item_id"
   end
 
