@@ -21,10 +21,6 @@ Spree.config do |config|
   config.image_attachment_module = 'Spree::Image::ActiveStorageAttachment'
   config.taxon_attachment_module = 'Spree::Taxon::ActiveStorageAttachment'
 
-  # Email configuration
-  config.mails_from = "cmoikvolelorange@gmail.com"
-  config.send_core_emails = true
-
   # Defaults
   # Permission Sets:
 
@@ -53,6 +49,13 @@ Spree.config do |config|
   # )
 end
 
+if ActiveRecord::Base.connection.table_exists? 'spree_stores'
+  Spree::Store.all.each do |store|
+    store.mail_from_address = 'cmoikvolelorange@gmail.com'
+    store.save!
+  end
+end
+
 Spree::Backend::Config.configure do |config|
   config.locale = 'en'
 
@@ -75,7 +78,6 @@ end
 Spree::Api::Config.configure do |config|
   config.requires_authentication = true
 end
-
 
 # Rules for avoiding to store the current path into session for redirects
 # When at least one rule is matched, the request path will not be stored
