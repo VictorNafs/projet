@@ -21,6 +21,10 @@ Spree.config do |config|
   config.image_attachment_module = 'Spree::Image::ActiveStorageAttachment'
   config.taxon_attachment_module = 'Spree::Taxon::ActiveStorageAttachment'
 
+  # Email configuration
+  config.mails_from = "cmoikvolelorange@gmail.com"
+  config.send_core_emails = true
+
   # Defaults
   # Permission Sets:
 
