@@ -21,17 +21,13 @@ Spree.config do |config|
   config.image_attachment_module = 'Spree::Image::ActiveStorageAttachment'
   config.taxon_attachment_module = 'Spree::Taxon::ActiveStorageAttachment'
 
-  # Email configuration
-  Spree::Store.all.each do |store|
-    store.mail_from_address = 'cmoikvolelorange@gmail.com'
-    store.save!
-  end
   # Defaults
   # Permission Sets:
 
   # Uncomment and customize the following line to add custom permission sets
   # to a custom users role:
   # config.roles.assign_permissions :role_name, ['Spree::PermissionSets::CustomPermissionSet']
+  config.mails_from = 'cmoikvolelorange@gmail.com' # This will be used for registration emails, etc.
 
   # Admin:
 
