@@ -1,23 +1,15 @@
-class UserMailer < ApplicationMailer
-  default from: 'cmoikvolelorange@gmail.com'
+# frozen_string_literal: true
 
-  def welcome_email(user)
-    @user = user
-    @url  = 'https://leasing-vehicule-487e54fd46f7.herokuapp.com/login' # replace with your login url
-    mail(to: @user.email, subject: 'Bienvenue chez nous !')
+class UserMailer < Spree::BaseMailer
+  def reset_password_instructions(user, token, *_args)
+    @store = Spree::Store.default
+    @edit_password_reset_url = edit_spree_user_password_url(reset_password_token: token, host: @store.url)
+    mail to: user.email, from: from_address(@store), subject: "#{@store.name} #{I18n.t(:subject, scope: [:devise, :mailer, :reset_password_instructions])}"
   end
 
-  def checkout_email(order)
-    @order = order
-    mail(to: @order.email, subject: 'Confirmation de votre achat')
+  def confirmation_instructions(user, token, _opts = {})
+    @store = Spree::Store.default
+    @confirmation_url = spree_user_confirmation_url(confirmation_token: token, host: @store.url)
+    mail to: user.email, from: from_address(@store), subject: "#{@store.name} #{I18n.t(:subject, scope: [:devise, :mailer, :confirmation_instructions])}"
   end
-
-  def contact_email(email, message, name)
-    @name = name
-    @email = email
-    @message = message
-
-    mail(to: 'cmoikvolelorange@gmail.com', subject: 'Nouveau message de contact')
-  end
-
 end
